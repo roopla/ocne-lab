@@ -1,0 +1,75 @@
+$ ipconfig
+
+Windows IP Configuration
+
+
+Ethernet adapter Ethernet:
+
+   Connection-specific DNS Suffix  . :
+   Link-local IPv6 Address . . . . . : fe80::e98e:1d21:3423:7011%22
+   IPv4 Address. . . . . . . . . . . : 192.168.137.1
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . :
+
+Ethernet adapter Ethernet 3:
+
+   Connection-specific DNS Suffix  . :
+   Link-local IPv6 Address . . . . . : fe80::55db:fa0f:16aa:c05d%10
+   IPv4 Address. . . . . . . . . . . : 192.168.56.1
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . :
+
+Ethernet adapter Ethernet 4:
+
+   Connection-specific DNS Suffix  . :
+   Link-local IPv6 Address . . . . . : fe80::314b:995c:4a07:9839%29
+   IPv4 Address. . . . . . . . . . . : 192.168.99.1
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . :
+
+Unknown adapter Local Area Connection:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . :
+
+Wireless LAN adapter Local Area Connection* 3:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . :
+
+Wireless LAN adapter Local Area Connection* 4:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . :
+
+Ethernet adapter VMware Network Adapter VMnet1:
+
+   Connection-specific DNS Suffix  . :
+   Link-local IPv6 Address . . . . . : fe80::526b:c91a:b887:6122%15
+   IPv4 Address. . . . . . . . . . . : 192.168.207.1
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . :
+
+Ethernet adapter VMware Network Adapter VMnet8:
+
+   Connection-specific DNS Suffix  . :
+   Link-local IPv6 Address . . . . . : fe80::dec6:a91f:48c7:a446%13
+   IPv4 Address. . . . . . . . . . . : 192.168.22.1
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . :
+
+Wireless LAN adapter Wi-Fi:
+
+   Connection-specific DNS Suffix  . : mynetworksettings.com
+   Link-local IPv6 Address . . . . . : fe80::3511:589a:d526:ce9a%7
+   IPv4 Address. . . . . . . . . . . : 192.168.1.160
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . : 192.168.1.1
+
+Ethernet adapter Bluetooth Network Connection 2:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . :
+
+alpoo@DESKTOP-LSS5R3E MINGW64 /d/ocne-lab (main)
+$
