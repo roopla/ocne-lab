@@ -1,0 +1,25 @@
+● Claude Code stores conversation history locally on each machine — it doesn't sync across workstations automatically.
+
+  Options to resume on another workstation:
+
+  1. Start fresh there — Just ask me to read runbook.md, CLAUDE.md, and lab.env again, then tell me "we completed through Phase 5 and Multus in Phase 6, ready to install cert-manager." I'll pick up immediately.
+  2. Copy the session — Claude Code stores history in ~/.claude/ (or the equivalent on Windows). You could copy that folder, but starting fresh is simpler.
+
+  The good news: All your progress is in the actual infrastructure (VMs, cluster, configs), not in this conversation. The cluster state is what matters, and that's on your lab network accessible from any workstation.
+
+  When you start on the new machine, just tell me where you left off and I'll continue from there.
+
+❯ so you want me copy runbook.md, CLAUDE.md, and lab.env and create a new folder and run claude code from that folder and ask "we completed through Phase 5 and Multus in Phase 6, ready to install cert-manager."
+
+● Even simpler — those files are already in your project folder D:\lab\ocne-lab.
+
+  If the new workstation can access the same folder (network share, synced via git, etc.):
+  - Just run claude from that folder
+  - Tell me: "Read runbook.md, CLAUDE.md, and lab.env. We completed through Phase 5 and Multus in Phase 6, ready to install cert-manager."
+
+  If it's a completely separate machine:
+  - Copy the entire D:\lab\ocne-lab folder to the new workstation
+  - Run claude from there
+  - Same prompt as above
+
+  That's it. I'll read the files, understand the context, and continue right where we left off.
