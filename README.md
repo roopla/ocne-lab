@@ -1,3 +1,88 @@
+# OCNE 1.9 + Oracle Database Operator Lab
+
+**Author:** Alpoor Pradeep Reddy
+
+## Overview
+
+This repository contains comprehensive documentation, scripts, and implementation guides for building and operating an Oracle Cloud Native Environment (OCNE) 1.9 cluster with the Oracle Database Operator. The lab environment runs on Oracle VirtualBox and demonstrates enterprise-grade Oracle database deployment patterns on Kubernetes.
+
+### Purpose and Objectives
+
+This lab serves a dual purpose:
+
+1. **Learning and Skill Development:** Provides hands-on experience with Oracle's cloud-native database technologies, including Kubernetes orchestration, Oracle Database Operator lifecycle management, Data Guard configuration, ASM storage, and Oracle Restart/RAC architectures. The step-by-step walkthroughs document real-world troubleshooting scenarios and solutions encountered during implementation.
+
+2. **Production-Ready Reference Architecture:** The configurations, patterns, and procedures documented here are designed to be adaptable for enterprise deployments. The lab validates deployment procedures, documents failure modes and their resolutions, and establishes operational runbooks that can be translated to production environments with appropriate scaling and security hardening.
+
+### Architecture Summary
+
+The lab consists of a 4-VM cluster running on VirtualBox:
+
+| VM | Role | Resources |
+|---|---|---|
+| ocne-op | OLCNE Operator node, NFS server | 2 vCPU, 4 GB RAM |
+| ocne-cp1 | Kubernetes Control Plane | 4 vCPU, 6 GB RAM |
+| ocne-w1 | Worker node (database workloads) | 8 vCPU, 20 GB RAM |
+| ocne-w2 | Worker node (database workloads) | 8 vCPU, 20 GB RAM |
+
+### Implementation Phases
+
+| Phase | Description | Status |
+|---|---|---|
+| 0-6 | Infrastructure setup: VMs, networking, storage, OCNE cluster, operator installation | Complete |
+| A | SingleInstanceDatabase + Data Guard with automated failover | Complete |
+| B | Oracle Restart with ASM storage on block devices | Complete |
+| C | Real Application Clusters (RAC) with shared storage | Planned |
+
+### Key Technologies Demonstrated
+
+- **Oracle Cloud Native Environment (OCNE) 1.9** - Enterprise Kubernetes distribution
+- **Oracle Database Operator** - Kubernetes operator for Oracle database lifecycle management
+- **Oracle Data Guard** - High availability and disaster recovery
+- **Oracle ASM (Automatic Storage Management)** - Database storage virtualization
+- **Oracle Restart** - Single-instance high availability
+- **Multus CNI** - Multiple network interface support for RAC interconnect
+- **cert-manager** - TLS certificate management for operator webhooks
+
+### Documentation Structure
+
+| Document | Description |
+|---|---|
+| `runbook.md` | Master runbook with Phases 0-6 (infrastructure setup) |
+| `complete-setup-guide.md` | Consolidated end-to-end setup guide with cleanup procedures |
+| `phase-a-sidb-dataguard-setup.md` | Phase A implementation walkthrough with lessons learned |
+| `phase-b-oracle-restart-asm-setup.md` | Phase B implementation walkthrough with lessons learned |
+| `architecture-diagrams.md` | Infrastructure and component architecture diagrams |
+| `troubleshooting-notes.md` | Common issues and resolutions |
+
+### Enterprise Applicability
+
+The patterns and procedures documented in this lab are directly applicable to enterprise Oracle database deployments on Kubernetes:
+
+- **Database-as-a-Service (DBaaS):** The Oracle Database Operator enables self-service database provisioning with standardized configurations, making it suitable for internal DBaaS platforms.
+
+- **Hybrid Cloud Deployments:** The same operator and configurations work across on-premises Kubernetes clusters, Oracle Cloud Infrastructure (OCI), and other cloud providers, enabling consistent database management across hybrid environments.
+
+- **DevOps Integration:** The declarative Custom Resource (CR) approach integrates naturally with GitOps workflows, CI/CD pipelines, and infrastructure-as-code practices.
+
+- **High Availability Patterns:** The Data Guard and RAC configurations demonstrate production-grade HA patterns that meet enterprise RTO/RPO requirements.
+
+- **Storage Flexibility:** The lab demonstrates both NFS-based storage (Phase A) and block storage with ASM (Phase B/C), covering the primary storage patterns used in enterprise deployments.
+
+### Prerequisites for Production Adaptation
+
+When translating this lab to production environments, consider:
+
+- Network security hardening (firewall rules, network policies, mTLS)
+- Storage performance and redundancy requirements
+- Backup and recovery procedures
+- Monitoring and alerting integration
+- RBAC and security context constraints
+- Resource quotas and limit ranges
+- Multi-tenancy considerations
+
+---
+
 # Using Claude Code to build this lab
 
 ## 1. Install Claude Code on the Windows host
