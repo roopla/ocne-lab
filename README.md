@@ -95,6 +95,62 @@ The AI assistant contributed to:
 
 This demonstrates the effectiveness of AI-assisted infrastructure development for complex enterprise software deployments, where the AI handles mechanical execution while the human provides domain expertise and decision-making for critical operations.
 
+### References and Resources
+
+#### GitHub Repositories
+
+| Repository | Purpose |
+|------------|---------|
+| [oracle/oracle-database-operator](https://github.com/oracle/oracle-database-operator) | Oracle Database Operator for Kubernetes - core operator used for SIDB, Data Guard, Oracle Restart, and RAC deployments |
+| [oracle/docker-images](https://github.com/oracle/docker-images) | Oracle Docker/Container images - includes RAC container image build scripts (`OracleDatabase/RAC/OracleRealApplicationClusters`) |
+| [cert-manager/cert-manager](https://github.com/cert-manager/cert-manager) | TLS certificate management for Kubernetes - required for operator webhooks |
+| [rancher/local-path-provisioner](https://github.com/rancher/local-path-provisioner) | Dynamic local storage provisioner for Kubernetes |
+
+#### Oracle Container Registry
+
+| Image | Usage |
+|-------|-------|
+| `container-registry.oracle.com/database/enterprise:19.3.0.0` | Oracle Database Enterprise Edition - used for Phase A (SIDB + Data Guard) |
+| `container-registry.oracle.com/database/rac:19.3.0` | Oracle RAC Database - used for Phase C |
+| `container-registry.oracle.com/os/oraclelinux:9` | Base image for custom builds |
+
+#### Oracle Documentation (My Oracle Support)
+
+| Doc ID | Title |
+|--------|-------|
+| 2965269.1 | Oracle RAC on Podman/Kubernetes - Prerequisites and Best Practices |
+| 2915366.2 | Building Gold Images for Oracle Grid Infrastructure and Database |
+| 2805794.1 | Oracle Database Operator for Kubernetes Documentation |
+| 1587357.1 | Using NFS with Oracle Database |
+
+#### Oracle Technology Network Downloads
+
+| Software | Version | File |
+|----------|---------|------|
+| Grid Infrastructure | 19.3.0 | `LINUX.X64_193000_grid_home.zip` |
+| Database | 19.3.0 | `LINUX.X64_193000_db_home.zip` |
+| GI Release Update 19.28 | Patch 37957391 | From MOS |
+| OPatch | Latest | Patch 6880880 |
+
+#### Official Documentation
+
+- [Oracle Cloud Native Environment 1.9 Documentation](https://docs.oracle.com/en/operating-systems/olcne/)
+- [Oracle Database Operator for Kubernetes](https://github.com/oracle/oracle-database-operator/blob/main/docs/README.md)
+- [Oracle Data Guard Concepts and Administration](https://docs.oracle.com/en/database/oracle/oracle-database/19/sbydb/)
+- [Oracle ASM Administrator's Guide](https://docs.oracle.com/en/database/oracle/oracle-database/19/ostmg/)
+- [Oracle Real Application Clusters Administration Guide](https://docs.oracle.com/en/database/oracle/oracle-database/19/racad/)
+- [Kubernetes Documentation](https://kubernetes.io/docs/)
+- [cert-manager Documentation](https://cert-manager.io/docs/)
+
+#### Tools Used
+
+| Tool | Purpose |
+|------|---------|
+| [Oracle VirtualBox](https://www.virtualbox.org/) | VM hypervisor for lab environment |
+| [Claude Code](https://claude.ai/claude-code) | AI-assisted development CLI tool |
+| [kubectl](https://kubernetes.io/docs/reference/kubectl/) | Kubernetes command-line interface |
+| [olcnectl](https://docs.oracle.com/en/operating-systems/olcne/) | OCNE cluster management CLI |
+
 ---
 
 # Using Claude Code to build this lab
