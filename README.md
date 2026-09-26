@@ -1,6 +1,7 @@
 # OCNE 1.9 + Oracle Database Operator Lab
 
 **Author:** Alpoor Pradeep Reddy
+**AI Assistant:** Claude Opus 4.5 (Anthropic) via [Claude Code](https://claude.ai/claude-code)
 
 ## Overview
 
@@ -80,6 +81,19 @@ When translating this lab to production environments, consider:
 - RBAC and security context constraints
 - Resource quotas and limit ranges
 - Multi-tenancy considerations
+
+### AI-Assisted Development
+
+This lab was developed with the assistance of **Claude Opus 4.5**, Anthropic's most capable AI model, accessed through **Claude Code** - Anthropic's official CLI tool for software engineering tasks.
+
+The AI assistant contributed to:
+
+- **Implementation Execution:** Running commands across Windows host and Linux VMs via SSH, managing VirtualBox VMs, and executing Kubernetes operations
+- **Troubleshooting:** Diagnosing and resolving issues such as glibc 2.34+ compatibility with Oracle 19c, DBCA failures in containerized environments, RBAC permission issues, and kernel parameter tuning
+- **Documentation:** Creating comprehensive walkthroughs, architecture diagrams, and cleanup procedures based on actual implementation experience
+- **Code Review:** Analyzing Oracle Database Operator configurations, Custom Resources, and deployment manifests
+
+This demonstrates the effectiveness of AI-assisted infrastructure development for complex enterprise software deployments, where the AI handles mechanical execution while the human provides domain expertise and decision-making for critical operations.
 
 ---
 
