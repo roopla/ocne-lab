@@ -748,3 +748,336 @@ srvctl status database -d ORCL
 | 02-operator-installed | Phase 6 | Before database deployment |
 | 03-phase-a-done | Phase A | Before ASM work |
 | 04-rac-prereqs | Phase B1 | Before RAC provision |
+
+---
+
+## Cleanup: Reset Phase A (SIDB + Data Guard)
+
+Use these steps to remove Phase A resources and start fresh. Run from a node with kubectl access.
+
+### Step 1: Delete Data Guard Broker (if exists)
+```bash
+kubectl get dataguardbroker -n sidb
+kubectl delete dataguardbroker --all -n sidb
+
+# Wait for deletion
+kubectl get pods -n sidb -w
+```
+
+### Step 2: Delete Standby Database
+```bash
+kubectl get singleinstancedatabase -n sidb
+
+# Delete standby first (if using Data Guard)
+kubectl delete singleinstancedatabase sidb-standby -n sidb
+
+# Wait for pod termination
+kubectl get pods -n sidb -w
+```
+
+### Step 3: Delete Primary Database
+```bash
+kubectl delete singleinstancedatabase sidb-primary -n sidb
+
+# Wait for all pods gone
+kubectl get pods -n sidb -w
+```
+
+### Step 4: Delete PVCs
+```bash
+kubectl get pvc -n sidb
+kubectl delete pvc --all -n sidb
+```
+
+### Step 5: Delete PVs
+```bash
+# List PVs related to sidb
+kubectl get pv | grep sidb
+
+# Delete them (adjust names as needed)
+kubectl delete pv sidb-pv-primary sidb-pv-standby
+
+# Or delete all Released PVs
+kubectl get pv | grep Released | awk '{print $1}' | xargs kubectl delete pv
+```
+
+### Step 6: Clean NFS Data Directories (on ocne-op)
+```bash
+# SSH to ocne-op
+ssh root@ocne-op
+
+# Remove database files (DESTRUCTIVE!)
+rm -rf /export/oradata/*
+
+# Recreate empty directories with correct ownership
+mkdir -p /export/oradata
+chown -R 54321:54321 /export/oradata
+chmod -R 775 /export/oradata
+
+# Verify
+ls -la /export/oradata
+```
+
+### Step 7: Verify Cleanup
+```bash
+kubectl get all -n sidb
+kubectl get pvc -n sidb
+kubectl get pv | grep sidb
+```
+
+### Optional: Keep or Recreate Secrets
+```bash
+# Check existing secrets
+kubectl get secrets -n sidb
+
+# If you need to recreate the image pull secret:
+kubectl delete secret oracle-container-registry-secret -n sidb
+
+kubectl create secret docker-registry oracle-container-registry-secret \
+  --docker-server=container-registry.oracle.com \
+  --docker-username='<your-oracle-sso-email>' \
+  --docker-password='<your-oracle-sso-password>' \
+  -n sidb
+```
+
+**Phase A is now reset. You can re-run phase-a-sidb-dataguard-setup.md from the beginning.**
+
+---
+
+## Cleanup: Reset Phase B (Oracle Restart + ASM)
+
+Use these steps to remove Phase B resources and start fresh.
+
+### Step 1: Delete OracleRestart CR
+```bash
+kubectl get oraclerestart -n rac
+
+# Delete the OracleRestart resource
+kubectl delete oraclerestart --all -n rac
+
+# Watch pods terminate (may take several minutes)
+kubectl get pods -n rac -w
+```
+
+### Step 2: Force Delete Stuck Pods (if needed)
+If pods are stuck in Terminating:
+```bash
+# List stuck pods
+kubectl get pods -n rac
+
+# Force delete (use with caution)
+kubectl delete pod <pod-name> -n rac --force --grace-period=0
+```
+
+### Step 3: Delete PVCs
+```bash
+kubectl get pvc -n rac
+kubectl delete pvc --all -n rac
+```
+
+### Step 4: Delete PVs
+```bash
+# List PVs related to rac/oracle-restart
+kubectl get pv | grep -E "rac|asm|oracle"
+
+# Delete them
+kubectl delete pv <pv-names>
+
+# Or delete all Released PVs
+kubectl get pv | grep Released | awk '{print $1}' | xargs kubectl delete pv
+```
+
+### Step 5: Clean Worker Node Directories (on both workers)
+
+On **ocne-w1** and **ocne-w2**:
+```bash
+# Remove Oracle installation directories (DESTRUCTIVE!)
+rm -rf /scratch/oracle/*
+rm -rf /scratch/oraInventory/*
+
+# Recreate with correct ownership
+mkdir -p /scratch/oracle/app/oracle
+mkdir -p /scratch/oracle/app/grid
+mkdir -p /scratch/oraInventory
+
+chown -R 54321:54321 /scratch/oracle
+chown -R 54321:54321 /scratch/oraInventory
+chmod -R 775 /scratch/oracle
+chmod -R 775 /scratch/oraInventory
+
+# Verify
+ls -la /scratch/
+```
+
+### Step 6: Wipe ASM Disk Headers (on both workers)
+
+**CRITICAL: This destroys all data on ASM disks!**
+
+On **ocne-w1** and **ocne-w2**:
+```bash
+# Verify which disks are ASM disks
+lsblk
+ls -l /dev/disk/by-id/ | grep asmdisk
+
+# Wipe first 100MB of each ASM disk (clears headers)
+dd if=/dev/zero of=/dev/sdc bs=1M count=100
+dd if=/dev/zero of=/dev/sdd bs=1M count=100
+dd if=/dev/zero of=/dev/sde bs=1M count=100
+
+# Verify disks are clean (should show no partition table)
+fdisk -l /dev/sdc /dev/sdd /dev/sde
+```
+
+### Step 7: Remove udev Rules (if any were created)
+On both workers:
+```bash
+rm -f /etc/udev/rules.d/99-oracle-asmdevices.rules
+udevadm control --reload-rules
+udevadm trigger
+```
+
+### Step 8: Verify Cleanup
+```bash
+kubectl get all -n rac
+kubectl get pvc -n rac
+kubectl get pv | grep -E "rac|asm|oracle"
+
+# On workers
+ls -la /scratch/oracle/
+ls -la /scratch/oraInventory/
+lsblk
+```
+
+### Optional: Keep or Recreate Secrets
+```bash
+# Check existing secrets
+kubectl get secrets -n rac
+
+# If you need to recreate:
+kubectl delete secret oracle-container-registry-secret -n rac
+
+kubectl create secret docker-registry oracle-container-registry-secret \
+  --docker-server=container-registry.oracle.com \
+  --docker-username='<your-oracle-sso-email>' \
+  --docker-password='<your-oracle-sso-password>' \
+  -n rac
+```
+
+**Phase B is now reset. You can re-run phase-b-oracle-restart-asm-setup.md from the beginning.**
+
+---
+
+## Cleanup: Full Reset to Snapshot
+
+If cleanup steps fail or you want a guaranteed clean slate:
+
+### Option 1: Restore from VirtualBox Snapshot
+```powershell
+# Power off all VMs first
+foreach ($vm in @("ocne-op","ocne-cp1","ocne-w1","ocne-w2")) {
+    VBoxManage controlvm $vm poweroff 2>$null
+}
+
+# Wait a few seconds
+Start-Sleep -Seconds 5
+
+# Restore to snapshot (e.g., 02-operator-installed)
+foreach ($vm in @("ocne-op","ocne-cp1","ocne-w1","ocne-w2")) {
+    VBoxManage snapshot $vm restore "02-operator-installed"
+}
+
+# Start VMs
+foreach ($vm in @("ocne-op","ocne-cp1","ocne-w1","ocne-w2")) {
+    VBoxManage startvm $vm --type headless
+}
+```
+
+### Option 2: Reset Kubernetes Namespaces Only
+```bash
+# Delete and recreate namespaces (removes ALL resources in them)
+kubectl delete ns sidb
+kubectl delete ns rac
+
+kubectl create ns sidb
+kubectl create ns rac
+
+# Recreate image pull secrets
+for ns in sidb rac; do
+  kubectl create secret docker-registry oracle-container-registry-secret \
+    --docker-server=container-registry.oracle.com \
+    --docker-username='<your-oracle-sso-email>' \
+    --docker-password='<your-oracle-sso-password>' \
+    -n "$ns"
+done
+```
+
+**Note:** Namespace deletion removes Kubernetes resources but does NOT clean:
+- NFS data on ocne-op
+- Local files on worker nodes
+- ASM disk headers
+
+You must still run the storage cleanup steps above.
+
+---
+
+## Quick Reset Commands Summary
+
+### Reset Phase A Only
+```bash
+# From kubectl node
+kubectl delete dataguardbroker --all -n sidb
+kubectl delete singleinstancedatabase --all -n sidb
+kubectl delete pvc --all -n sidb
+kubectl get pv | grep sidb | awk '{print $1}' | xargs kubectl delete pv
+
+# On ocne-op
+ssh root@ocne-op "rm -rf /export/oradata/* && chown -R 54321:54321 /export/oradata"
+```
+
+### Reset Phase B Only
+```bash
+# From kubectl node
+kubectl delete oraclerestart --all -n rac
+kubectl delete pvc --all -n rac
+kubectl get pv | grep -E 'rac|asm' | awk '{print $1}' | xargs kubectl delete pv
+
+# On both workers (run on each)
+for host in ocne-w1 ocne-w2; do
+  ssh root@$host 'rm -rf /scratch/oracle/* /scratch/oraInventory/* && \
+    mkdir -p /scratch/oracle/app/oracle /scratch/oracle/app/grid /scratch/oraInventory && \
+    chown -R 54321:54321 /scratch/oracle /scratch/oraInventory && \
+    dd if=/dev/zero of=/dev/sdc bs=1M count=100 && \
+    dd if=/dev/zero of=/dev/sdd bs=1M count=100 && \
+    dd if=/dev/zero of=/dev/sde bs=1M count=100'
+done
+```
+
+### Reset Both Phases
+```bash
+# Namespaces
+kubectl delete ns sidb rac
+kubectl create ns sidb
+kubectl create ns rac
+
+# Recreate secrets
+for ns in sidb rac; do
+  kubectl create secret docker-registry oracle-container-registry-secret \
+    --docker-server=container-registry.oracle.com \
+    --docker-username='<your-email>' \
+    --docker-password='<your-password>' \
+    -n "$ns"
+done
+
+# NFS cleanup (ocne-op)
+ssh root@ocne-op 'rm -rf /export/oradata/* && chown -R 54321:54321 /export/oradata'
+
+# Worker cleanup (both)
+for host in ocne-w1 ocne-w2; do
+  ssh root@$host 'rm -rf /scratch/oracle/* /scratch/oraInventory/* && \
+    mkdir -p /scratch/oracle/app/oracle /scratch/oracle/app/grid /scratch/oraInventory && \
+    chown -R 54321:54321 /scratch/oracle /scratch/oraInventory && \
+    dd if=/dev/zero of=/dev/sdc bs=1M count=100 && \
+    dd if=/dev/zero of=/dev/sdd bs=1M count=100 && \
+    dd if=/dev/zero of=/dev/sde bs=1M count=100'
+done
+```
