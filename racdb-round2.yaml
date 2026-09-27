@@ -1,0 +1,120 @@
+---
+# ROUND 2 OPTIMIZED RAC DEPLOYMENT
+# Key changes from Round 1:
+# - REMOVED ruPatchLocation (saves ~2-3 hours - image already has 19.32)
+# - REMOVED oPatchLocation (not needed with pre-patched image)
+# - Using 2 ASM disks instead of 3 (sufficient for EXTERNAL redundancy)
+# - Secrets already exist in 'rac' namespace from Round 1
+
+apiVersion: database.oracle.com/v4
+kind: RacDatabase
+metadata:
+  name: racdb01
+  namespace: rac
+spec:
+  instanceDetails:
+    nodeCount: 2
+    racHostSwLocation: /scratch/rac/cluster01
+    racNodeName: racnode
+
+    baseOnsTargetPort: 30200
+    baseLsnrTargetPort: 31522
+
+    privateIPDetails:
+      - name: rac-priv1
+        interface: ens1
+      - name: rac-priv2
+        interface: ens2
+
+    workerNodeSelector:
+      raccluster: raccluster01
+
+  envVars:
+    - name: LOG_DIR
+      value: "/tmp/orod"
+    - name: IGNORE_CRS_PREREQS
+      value: "true"
+    - name: IGNORE_DB_PREREQS
+      value: "true"
+
+  # ASM Disk Group - using 2 disks (EXTERNAL redundancy = no mirroring)
+  asmDiskGroupDetails:
+    - name: DATA
+      redundancy: EXTERNAL
+      type: CRSDG
+      disks:
+        - /dev/disk/by-id/ata-VBOX_HARDDISK_asmdisk0001
+        - /dev/disk/by-id/ata-VBOX_HARDDISK_asmdisk0002
+
+  sshKeySecret:
+    name: ssh-key-secret
+    privKeySecretName: ssh-privkey
+    pubKeySecretName: ssh-pubkey
+
+  dbSecret:
+    name: db-user-pass-pkutl
+    keyFileName: key.pem
+    pwdFileName: pwdfile.enc
+    encryptionType: pkeyutl
+    pkeyopt: rsa_padding_mode:oaep;rsa_oaep_md:sha256;rsa_mgf1_md:sha256
+
+  # Pre-patched image with 19.32 RU already applied
+  image: container-registry.oracle.com/database/rac_ru:latest-19
+  imagePullPolicy: IfNotPresent
+  imagePullSecret: oracle-container-registry-secret
+
+  scanSvcName: racnode-scan
+  scanSvcTargetPort: 31521
+
+  serviceDetails:
+    name: racpdb
+
+  resources:
+    requests:
+      memory: "16Gi"
+      cpu: "4"
+    limits:
+      memory: "18Gi"
+      cpu: "6"
+
+  securityContext:
+    sysctls:
+      - name: kernel.shmall
+        value: "4194304"
+      - name: kernel.sem
+        value: "250 32000 100 128"
+      - name: kernel.shmmax
+        value: "17179869184"
+      - name: kernel.shmmni
+        value: "4096"
+      - name: net.ipv4.conf.all.rp_filter
+        value: "2"
+
+  configParams:
+    gridHome: "/u01/app/19c/grid"
+    gridBase: "/u01/app/grid"
+    dbHome: "/u01/app/oracle/product/19c/dbhome_1"
+    dbBase: "/u01/app/oracle"
+    inventory: "/u01/app/oraInventory"
+    sgaSize: "8G"
+    pgaSize: "2G"
+    processes: 1000
+    cpuCount: 4
+    dbName: "RACDB"
+    pdbName: "ORCLPDB"
+    dbCharSet: "AL32UTF8"
+
+    # ============================================================
+    # ROUND 2 OPTIMIZATION: These parameters are INTENTIONALLY OMITTED
+    # ============================================================
+    # The rac_ru:latest-19 image already has 19.32.0.0.0 RU pre-applied.
+    # In Round 1, specifying these caused redundant patching (~2-3 hours wasted).
+    #
+    # DO NOT ADD these unless you need patches NEWER than 19.32:
+    # hostSwStageLocation: "/scratch/software/stage"
+    # gridSwZipFile: "LINUX.X64_193000_grid_home.zip"
+    # dbSwZipFile: "LINUX.X64_193000_db_home.zip"
+    # oPatchSwZipFile: "p6880880_190000_Linux-x86-64.zip"
+    # ruPatchLocation: "/scratch/software/stage/19c/19.29/RU/39467003"
+    # oPatchLocation: "/scratch/software/stage/19c/19.29/OPATCH"
+    # ============================================================
