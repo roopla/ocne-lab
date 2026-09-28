@@ -2,11 +2,11 @@
 
 You are helping build a 4-VM Oracle Cloud Native Environment 1.9 cluster on VirtualBox,
 then exercising the Oracle Database Operator on it. The authoritative build instructions
-are in `runbook.md` in this folder. Read it before acting.
+are in `docs/runbook.md`. Read it before acting.
 
 ## Your operating rules
 
-1. **`runbook.md` is the spec.** Follow it phase by phase. If a command in it fails or looks
+1. **`docs/runbook.md` is the spec.** Follow it phase by phase. If a command in it fails or looks
    wrong for what you actually observe on the machine, say so and propose a fix. Do not
    silently substitute a different approach.
 2. **One phase at a time.** Stop at each `Gate:` line, run the verification commands, and

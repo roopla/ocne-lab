@@ -144,8 +144,8 @@ ssh root@ocne-w2 "ip link set enp0s8 promisc on && ip link set enp0s9 promisc on
 ### Option A: Use Optimized YAML
 
 ```bash
-# Copy optimized yaml to operator node
-scp racdb-round2.yaml root@ocne-op:/root/
+# Copy optimized yaml to operator node (from repo root)
+scp configs/racdb-round2.yaml root@ocne-op:/root/
 
 # Deploy
 ssh root@ocne-op "kubectl apply -f /root/racdb-round2.yaml"

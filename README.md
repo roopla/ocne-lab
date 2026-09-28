@@ -33,7 +33,7 @@ The lab consists of a 4-VM cluster running on VirtualBox:
 | 0-6 | Infrastructure setup: VMs, networking, storage, OCNE cluster, operator installation | Complete |
 | A | SingleInstanceDatabase + Data Guard with automated failover | Complete |
 | B | Oracle Restart with ASM storage on block devices | Complete |
-| C | Real Application Clusters (RAC) with shared storage | Planned |
+| C | Real Application Clusters (RAC) with shared storage | Complete |
 
 ### Key Technologies Demonstrated
 
@@ -45,16 +45,51 @@ The lab consists of a 4-VM cluster running on VirtualBox:
 - **Multus CNI** - Multiple network interface support for RAC interconnect
 - **cert-manager** - TLS certificate management for operator webhooks
 
-### Documentation Structure
+### Repository Structure
 
-| Document | Description |
-|---|---|
-| `runbook.md` | Master runbook with Phases 0-6 (infrastructure setup) |
-| `complete-setup-guide.md` | Consolidated end-to-end setup guide with cleanup procedures |
-| `phase-a-sidb-dataguard-setup.md` | Phase A implementation walkthrough with lessons learned |
-| `phase-b-oracle-restart-asm-setup.md` | Phase B implementation walkthrough with lessons learned |
-| `architecture-diagrams.md` | Infrastructure and component architecture diagrams |
-| `troubleshooting-notes.md` | Common issues and resolutions |
+```
+ocne-lab/
+├── README.md                          # This file
+├── CLAUDE.md                          # Claude Code operating rules
+├── lab.env                            # Environment variables
+│
+├── docs/
+│   ├── runbook.md                     # Master runbook (Phases 0-6)
+│   ├── setup-guide.md                 # Consolidated end-to-end setup
+│   ├── architecture.md                # Infrastructure diagrams
+│   │
+│   ├── phases/                        # Phase implementation guides
+│   │   ├── phase-a-sidb-dataguard.md  # Phase A: SIDB + Data Guard
+│   │   ├── phase-b-oracle-restart.md  # Phase B: Oracle Restart + ASM
+│   │   └── phase-c-rac.md             # Phase C: RAC deployment
+│   │
+│   ├── rac/                           # RAC-specific documentation
+│   │   ├── architecture.md            # RAC architecture (Mermaid diagrams)
+│   │   ├── networking.md              # RAC networking guide
+│   │   ├── operations.md              # srvctl/crsctl operations
+│   │   ├── images.md                  # Container image guide
+│   │   ├── deployment-proof.md        # Deployment verification
+│   │   └── deployment-runbook.md      # RAC deployment steps
+│   │
+│   ├── troubleshooting/               # Troubleshooting guides
+│   │   ├── general.md                 # Common issues
+│   │   └── enterprise-ru-image.md     # Image-specific issues
+│   │
+│   └── operations/                    # Operational procedures
+│       ├── snapshot-restore.md        # VM snapshot/restore guide
+│       └── round2-preflight.md        # Round 2 deployment checklist
+│
+├── configs/                           # Kubernetes manifests
+│   ├── racdb.yaml                     # RAC config (Round 1)
+│   └── racdb-round2.yaml              # RAC config (optimized)
+│
+└── scripts/                           # Automation scripts
+    ├── check-gate.sh                  # Phase gate verification
+    ├── phase-a-cleanup.sh             # Phase A cleanup
+    ├── phase-a-setup.sh               # Phase A setup
+    ├── restore-round1.ps1             # Restore snapshot (PowerShell)
+    └── restore-round1.sh              # Restore snapshot (Bash)
+```
 
 ### Enterprise Applicability
 
@@ -194,7 +229,9 @@ Put this folder somewhere outside `D:\VMs` so a VM rebuild never touches it, for
 ocne-lab/
   CLAUDE.md          <- operating rules; Claude Code reads this automatically
   lab.env            <- all environment-specific values, in one place
-  runbook.md         <- the build instructions (export from the Claude doc)
+  docs/
+    runbook.md       <- the build instructions
+  configs/           <- Kubernetes manifests (racdb.yaml, etc.)
   scripts/
     check-gate.sh    <- read-only phase gate verification
   notes/             <- create this; put your own observations here

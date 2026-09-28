@@ -479,11 +479,11 @@ configParams:
 
 ## Related Documentation
 
-- [RAC Architecture Diagrams](RAC_ARCHITECTURE_DIAGRAM.md) - Mermaid diagrams
-- [RAC Networking Guide](RAC_NETWORKING_GUIDE.md) - Detailed network configuration
-- [RAC Operations Guide](RAC_OPERATIONS_GUIDE.md) - srvctl/crsctl commands
-- [RAC Image Guide](RAC_IMAGE_GUIDE.md) - Container image details
-- [RAC Deployment Proof](RAC_DEPLOYMENT_PROOF.md) - Verification outputs
+- [RAC Architecture Diagrams](../rac/architecture.md) - Mermaid diagrams
+- [RAC Networking Guide](../rac/networking.md) - Detailed network configuration
+- [RAC Operations Guide](../rac/operations.md) - srvctl/crsctl commands
+- [RAC Image Guide](../rac/images.md) - Container image details
+- [RAC Deployment Proof](../rac/deployment-proof.md) - Verification outputs
 
 ---
 
