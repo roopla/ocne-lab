@@ -1,0 +1,68 @@
+# Network Attachment Definitions for Oracle RAC
+#
+# PURPOSE:
+# These define additional network interfaces for RAC pods using Multus CNI.
+# RAC requires private interconnects for cluster communication (Cache Fusion).
+#
+# PREREQUISITES:
+# 1. Multus CNI installed on the cluster
+# 2. Physical NICs (enp0s8, enp0s9) exist on worker nodes
+# 3. VirtualBox Internal Networks configured for these NICs
+# 4. Namespace 'rac' must exist
+#
+# HOW TO CREATE:
+#   kubectl create namespace rac   # if not exists
+#   kubectl apply -f network-attachment-definitions.yaml
+#
+# HOW TO VERIFY:
+#   kubectl get net-attach-def -n rac
+#
+# HOW TO DELETE:
+#   kubectl delete -f network-attachment-definitions.yaml
+
+---
+# First Private Interconnect (enp0s8 → ens1 in pod)
+# Subnet: 192.168.10.0/24
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: rac-priv1
+  namespace: rac
+spec:
+  config: |
+    {
+      "cniVersion": "0.3.0",
+      "type": "macvlan",
+      "master": "enp0s8",
+      "mode": "bridge",
+      "ipam": {
+        "type": "host-local",
+        "subnet": "192.168.10.0/24",
+        "rangeStart": "192.168.10.100",
+        "rangeEnd": "192.168.10.120"
+      }
+    }
+
+---
+# Second Private Interconnect (enp0s9 → ens2 in pod)
+# Subnet: 192.168.11.0/24
+# Purpose: Redundancy - if first interconnect fails, cluster still functions
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: rac-priv2
+  namespace: rac
+spec:
+  config: |
+    {
+      "cniVersion": "0.3.0",
+      "type": "macvlan",
+      "master": "enp0s9",
+      "mode": "bridge",
+      "ipam": {
+        "type": "host-local",
+        "subnet": "192.168.11.0/24",
+        "rangeStart": "192.168.11.100",
+        "rangeEnd": "192.168.11.120"
+      }
+    }
