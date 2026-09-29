@@ -5,6 +5,9 @@
 # - REMOVED oPatchLocation (not needed with pre-patched image)
 # - Using 2 ASM disks instead of 3 (sufficient for EXTERNAL redundancy)
 # - Secrets already exist in 'rac' namespace from Round 1
+#
+# NOTE: hostSwStageLocation/gridSwZipFile/dbSwZipFile are still required
+# by CRD validation, but binaries won't be extracted (already in image)
 
 apiVersion: database.oracle.com/v4
 kind: RacDatabase
@@ -103,18 +106,17 @@ spec:
     dbName: "RACDB"
     pdbName: "ORCLPDB"
     dbCharSet: "AL32UTF8"
-
+    # Required by CRD validation (binaries already in image, won't extract)
+    hostSwStageLocation: "/scratch/software/stage"
+    gridSwZipFile: "LINUX.X64_193000_grid_home.zip"
+    dbSwZipFile: "LINUX.X64_193000_db_home.zip"
     # ============================================================
-    # ROUND 2 OPTIMIZATION: These parameters are INTENTIONALLY OMITTED
+    # ROUND 2 OPTIMIZATION: ruPatchLocation/oPatchLocation OMITTED
     # ============================================================
     # The rac_ru:latest-19 image already has 19.32.0.0.0 RU pre-applied.
-    # In Round 1, specifying these caused redundant patching (~2-3 hours wasted).
+    # Omitting these prevents redundant patching (~2-3 hours saved).
     #
     # DO NOT ADD these unless you need patches NEWER than 19.32:
-    # hostSwStageLocation: "/scratch/software/stage"
-    # gridSwZipFile: "LINUX.X64_193000_grid_home.zip"
-    # dbSwZipFile: "LINUX.X64_193000_db_home.zip"
-    # oPatchSwZipFile: "p6880880_190000_Linux-x86-64.zip"
-    # ruPatchLocation: "/scratch/software/stage/19c/19.29/RU/39467003"
-    # oPatchLocation: "/scratch/software/stage/19c/19.29/OPATCH"
+    # ruPatchLocation: "/scratch/software/stage/19c/19.32/RU/..."
+    # oPatchLocation: "/scratch/software/stage/19c/19.32/OPATCH"
     # ============================================================
